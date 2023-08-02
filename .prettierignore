@@ -1,0 +1,6 @@
+# Ignore artifacts:
+node_modules
+.sst
+.build
+.DS_Store
+.env*.local
