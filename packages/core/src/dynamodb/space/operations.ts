@@ -1,0 +1,29 @@
+import { dynamoDbClient } from '../client';
+import {
+    DynamoDBDocumentClient,
+    QueryCommand,
+    GetCommand,
+    DeleteCommand,
+    UpdateCommand,
+    PutCommand,
+} from '@aws-sdk/lib-dynamodb';
+import { Table } from 'sst/node/table';
+import { v4 as uuid } from 'uuid';
+
+const docClient = DynamoDBDocumentClient.from(dynamoDbClient);
+
+export const createSpace = async (name: string) => {
+    const spaceId = uuid();
+
+    const command = new PutCommand({
+        TableName: Table.SpaceTable.tableName,
+        Item: {
+            space_id: spaceId,
+            name: name,
+        },
+    });
+
+    const response = await docClient.send(command);
+    console.log(response);
+    return response;
+};
