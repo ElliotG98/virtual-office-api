@@ -9,6 +9,9 @@ import { JSONSchema7 } from 'json-schema';
 
 export const baseHandler = ApiHandler(async (_evt) => {
     try {
+        const { name } = _evt.body as any;
+        console.log('name', name);
+
         return response(200, { message: 'success' });
     } catch (e) {
         console.error('Error:', e);

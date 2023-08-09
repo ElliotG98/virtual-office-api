@@ -1,36 +1,12 @@
 {
     "type": "object",
-    "required": ["queryStringParameters", "body"],
+    "required": ["body"],
     "properties": {
-        "queryStringParameters": {
-            "type": "object",
-            "required": ["customerAccessToken"],
-            "properties": {
-                "customerAccessToken": {
-                    "type": "string"
-                }
-            }
-        },
         "body": {
             "type": "object",
             "properties": {
-                "firstName": {
+                "name": {
                     "type": "string"
-                },
-                "lastName": {
-                    "type": "string"
-                },
-                "password": {
-                    "type": "string"
-                },
-                "phone": {
-                    "type": "string"
-                },
-                "email": {
-                    "type": "string"
-                },
-                "acceptsMarketing": {
-                    "type": "boolean"
                 }
             }
         }

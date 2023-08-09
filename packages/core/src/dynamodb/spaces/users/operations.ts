@@ -1,10 +1,7 @@
-import { dynamoDbClient } from '../client';
+import { dynamoDbClient } from '../../client';
 import {
     DynamoDBDocumentClient,
     QueryCommand,
-    GetCommand,
-    DeleteCommand,
-    UpdateCommand,
     PutCommand,
 } from '@aws-sdk/lib-dynamodb';
 import { Table } from 'sst/node/table';

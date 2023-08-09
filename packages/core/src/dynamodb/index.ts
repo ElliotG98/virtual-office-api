@@ -1,3 +1,3 @@
 export * from './client';
-export * from './user/operations';
-export * from './space/operations';
+export * from './spaces/users';
+export * from './spaces';
