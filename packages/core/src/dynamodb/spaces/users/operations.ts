@@ -25,6 +25,7 @@ export const addUserToSpace = async (userId: string, spaceId: string) => {
 export const getUsersBySpace = async (spaceId: string) => {
     const command = new QueryCommand({
         TableName: Table.UserSpaceTable.tableName,
+        IndexName: 'bySpace',
         KeyConditionExpression: '#spaceId = :spaceIdVal',
         ExpressionAttributeNames: {
             '#spaceId': 'space_id',
@@ -35,5 +36,6 @@ export const getUsersBySpace = async (spaceId: string) => {
     });
 
     const response = await docClient.send(command);
-    return response.Items;
+    const userIds = response.Items?.map((item) => item.user_id);
+    return userIds;
 };

@@ -6,10 +6,16 @@ import {
     genericSchemaResponse,
 } from '@virtual-office-api/core/utils';
 import { JSONSchema7 } from 'json-schema';
+import { getUsersBySpace } from '@virtual-office-api/core/dynamodb';
 
 export const baseHandler = ApiHandler(async (_evt) => {
     try {
-        return response(200, { message: 'success' });
+        const { space_id } = _evt.pathParameters as any;
+        console.log('space_id', space_id);
+
+        const users = await getUsersBySpace(space_id);
+
+        return response(200, { message: 'success', users });
     } catch (e) {
         console.error('Error:', e);
         throw e;

@@ -33,12 +33,25 @@ export function VirtualOfficeStack({ stack }: StackContext) {
         primaryIndex: { partitionKey: 'space_id', sortKey: 'timestamp' },
     });
 
+    const auth = new Cognito(stack, 'Auth', {
+        login: ['email'],
+    });
+
     const api = new Api(stack, 'Api', {
         defaults: {
             function: {
                 bind: [spaceTable, userSpaceTable, messagesTable],
             },
-            authorizer: 'iam',
+            authorizer: 'jwt',
+        },
+        authorizers: {
+            jwt: {
+                type: 'user_pool',
+                userPool: {
+                    id: auth.userPoolId,
+                    clientIds: [auth.userPoolClientId],
+                },
+            },
         },
         routes: {
             'POST /spaces': baseLambdaPath + 'spaces/create.handler',
@@ -47,10 +60,6 @@ export function VirtualOfficeStack({ stack }: StackContext) {
             'GET /spaces/{space_id}/users':
                 baseLambdaPath + 'spaces/modules/users/get.handler',
         },
-    });
-
-    const auth = new Cognito(stack, 'Auth', {
-        login: ['email'],
     });
 
     auth.attachPermissionsForAuthUsers(stack, [api]);

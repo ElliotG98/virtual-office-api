@@ -7,6 +7,7 @@ const docClient = DynamoDBDocumentClient.from(dynamoDbClient);
 
 export const createSpace = async (name: string) => {
     const spaceId = uuid();
+    console.log('Creating space', spaceId);
 
     const command = new PutCommand({
         TableName: Table.SpaceTable.tableName,
@@ -18,5 +19,5 @@ export const createSpace = async (name: string) => {
 
     const response = await docClient.send(command);
     console.log(response);
-    return response;
+    return spaceId;
 };
