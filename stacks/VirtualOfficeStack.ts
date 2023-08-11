@@ -56,7 +56,7 @@ export function VirtualOfficeStack({ stack }: StackContext) {
         routes: {
             'POST /spaces': baseLambdaPath + 'spaces/create.handler',
             'POST /spaces/{space_id}/users':
-                baseLambdaPath + 'spaces/modules/users/update.handler',
+                baseLambdaPath + 'spaces/modules/users/create.handler',
             'GET /spaces/{space_id}/users':
                 baseLambdaPath + 'spaces/modules/users/get.handler',
         },
