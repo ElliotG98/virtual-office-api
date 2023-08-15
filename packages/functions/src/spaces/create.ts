@@ -20,12 +20,12 @@ export const baseHandler = ApiHandler(
 
             if (!user_id) throw new Error('User not found');
 
-            const spaceId = await createSpace(name);
-            console.log('spaceId', spaceId);
+            const space_id = await createSpace(name);
+            console.log('space_id', space_id);
 
-            await addUserToSpace(user_id, spaceId);
+            await addUserToSpace(user_id, space_id);
 
-            return response(200, { message: 'success' });
+            return response(200, { message: 'success', space_id });
         } catch (e) {
             console.error('Error:', e);
             throw e;
