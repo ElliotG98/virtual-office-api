@@ -6,7 +6,7 @@ import {
     genericSchemaResponse,
 } from '@virtual-office-api/core/utils';
 import { JSONSchema7 } from 'json-schema';
-import { addUserToSpace, createSpace } from '@virtual-office-api/core/dynamodb';
+import { addUser } from '@virtual-office-api/core/dynamodb';
 import { APIGatewayProxyEventWithAuthorizer } from '@virtual-office-api/core/types';
 
 export const baseHandler = ApiHandler(
@@ -20,12 +20,9 @@ export const baseHandler = ApiHandler(
 
             if (!user_id) throw new Error('User not found');
 
-            const space_id = await createSpace(name);
-            console.log('space_id', space_id);
+            await addUser({ id: user_id, name });
 
-            await addUserToSpace(user_id, space_id);
-
-            return response(200, { space_id });
+            return response(200, { message: 'success' });
         } catch (e) {
             console.error('Error:', e);
             throw e;

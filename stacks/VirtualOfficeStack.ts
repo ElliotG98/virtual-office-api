@@ -1,8 +1,16 @@
-import { Api, Table, StackContext, Cognito } from 'sst/constructs';
+import { Api, Table, StackContext, Cognito, Config } from 'sst/constructs';
 
 const baseLambdaPath = 'packages/functions/src/';
 
 export function VirtualOfficeStack({ stack }: StackContext) {
+    const userTable = new Table(stack, 'UserTable', {
+        fields: {
+            user_id: 'string',
+            name: 'string',
+        },
+        primaryIndex: { partitionKey: 'user_id' },
+    });
+
     const spaceTable = new Table(stack, 'SpaceTable', {
         fields: {
             space_id: 'string',
@@ -37,10 +45,29 @@ export function VirtualOfficeStack({ stack }: StackContext) {
         login: ['email'],
     });
 
+    const USER_POOL_ID = new Config.Parameter(stack, 'USER_POOL_ID', {
+        value: auth.userPoolId,
+    });
+
+    const USER_POOL_CLIENT_ID = new Config.Parameter(
+        stack,
+        'USER_POOL_CLIENT_ID',
+        {
+            value: auth.userPoolClientId,
+        },
+    );
+
     const api = new Api(stack, 'Api', {
         defaults: {
             function: {
-                bind: [spaceTable, userSpaceTable, messagesTable],
+                bind: [
+                    spaceTable,
+                    userSpaceTable,
+                    messagesTable,
+                    userTable,
+                    USER_POOL_ID,
+                    USER_POOL_CLIENT_ID,
+                ],
             },
             authorizer: 'jwt',
         },
@@ -60,6 +87,7 @@ export function VirtualOfficeStack({ stack }: StackContext) {
                 baseLambdaPath + 'spaces/modules/users/create.handler',
             'GET /spaces/{space_id}/users':
                 baseLambdaPath + 'spaces/modules/users/get.handler',
+            'POST /users': baseLambdaPath + 'users/create.handler',
         },
     });
 
@@ -73,5 +101,6 @@ export function VirtualOfficeStack({ stack }: StackContext) {
         spaceTableArn: spaceTable.tableArn,
         userSpaceTableArn: userSpaceTable.tableArn,
         messagesTableArn: messagesTable.tableArn,
+        userTableArn: userTable.tableArn,
     });
 }

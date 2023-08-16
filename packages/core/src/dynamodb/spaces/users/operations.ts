@@ -3,6 +3,7 @@ import {
     DynamoDBDocumentClient,
     QueryCommand,
     PutCommand,
+    BatchGetCommand,
 } from '@aws-sdk/lib-dynamodb';
 import { Table } from 'sst/node/table';
 
@@ -37,5 +38,18 @@ export const getUsersBySpace = async (spaceId: string) => {
 
     const response = await docClient.send(command);
     const userIds = response.Items?.map((item) => item.user_id);
-    return userIds;
+    if (!userIds || userIds.length === 0) return [];
+
+    const keys = userIds.map((userId) => ({ user_id: userId }));
+
+    const userCommand = new BatchGetCommand({
+        RequestItems: {
+            [Table.UserTable.tableName]: {
+                Keys: keys,
+            },
+        },
+    });
+
+    const userResponse = await docClient.send(userCommand);
+    return userResponse.Responses?.[Table.UserTable.tableName] || [];
 };

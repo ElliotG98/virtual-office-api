@@ -15,7 +15,7 @@ export const baseHandler = ApiHandler(async (_evt) => {
 
         const users = await getUsersBySpace(space_id);
 
-        return response(200, { message: 'success', users });
+        return response(200, { users });
     } catch (e) {
         console.error('Error:', e);
         throw e;
