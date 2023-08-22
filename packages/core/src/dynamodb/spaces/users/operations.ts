@@ -9,12 +9,17 @@ import { Table } from 'sst/node/table';
 
 const docClient = DynamoDBDocumentClient.from(dynamoDbClient);
 
-export const addUserToSpace = async (userId: string, spaceId: string) => {
+export const addUserToSpace = async (
+    userId: string,
+    spaceId: string,
+    status: string,
+) => {
     const command = new PutCommand({
         TableName: Table.UserSpaceTable.tableName,
         Item: {
             user_id: userId,
             space_id: spaceId,
+            status: status,
         },
     });
 

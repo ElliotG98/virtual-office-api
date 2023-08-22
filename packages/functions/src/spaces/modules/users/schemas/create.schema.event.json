@@ -10,6 +10,14 @@
                     "type": "string"
                 }
             }
+        },
+        "body": {
+            "type": "object",
+            "properties": {
+                "status": {
+                    "type": "string"
+                }
+            }
         }
     }
 }

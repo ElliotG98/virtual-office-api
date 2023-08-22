@@ -15,12 +15,15 @@ export const baseHandler = ApiHandler(
             const { space_id } = _evt.pathParameters as any;
             console.log('space_id', space_id);
 
+            const { status } = _evt.body as any;
+            console.log('status', status);
+
             const user_id = _evt.requestContext?.authorizer?.jwt.claims.sub;
             console.log('user_id', user_id);
 
             if (!user_id) throw new Error('User not found');
 
-            await addUserToSpace(user_id, space_id);
+            await addUserToSpace(user_id, space_id, status);
 
             return response(200, { message: 'success' });
         } catch (e) {

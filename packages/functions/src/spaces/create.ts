@@ -23,7 +23,7 @@ export const baseHandler = ApiHandler(
             const space_id = await createSpace(name);
             console.log('space_id', space_id);
 
-            await addUserToSpace(user_id, space_id);
+            await addUserToSpace(user_id, space_id, 'active');
 
             return response(200, { space_id });
         } catch (e) {

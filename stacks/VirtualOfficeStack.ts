@@ -7,6 +7,7 @@ export function VirtualOfficeStack({ stack }: StackContext) {
         fields: {
             user_id: 'string',
             name: 'string',
+            email: 'string',
         },
         primaryIndex: { partitionKey: 'user_id' },
     });
@@ -23,6 +24,7 @@ export function VirtualOfficeStack({ stack }: StackContext) {
         fields: {
             user_id: 'string',
             space_id: 'string',
+            status: 'string',
         },
         primaryIndex: { partitionKey: 'user_id', sortKey: 'space_id' },
         globalIndexes: {
@@ -88,6 +90,8 @@ export function VirtualOfficeStack({ stack }: StackContext) {
             'GET /spaces/{space_id}/users':
                 baseLambdaPath + 'spaces/modules/users/get.handler',
             'POST /users': baseLambdaPath + 'users/create.handler',
+            'GET /users/spaces':
+                baseLambdaPath + 'users/modules/spaces/get.handler',
         },
     });
 

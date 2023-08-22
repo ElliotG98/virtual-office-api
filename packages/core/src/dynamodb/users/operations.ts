@@ -11,6 +11,7 @@ export const addUser = async (user: User) => {
         Item: {
             user_id: user.id,
             name: user.name,
+            email: user.email,
         },
     });
 

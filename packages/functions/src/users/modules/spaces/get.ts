@@ -1,28 +1,24 @@
 import { ApiHandler } from 'sst/node/api';
-import createEventSchema from './schemas/create.schema.event.json';
+import getEventSchema from './schemas/get.schema.event.json';
 import { middyWrapper } from '@virtual-office-api/core/utils/middleware';
 import {
     response,
     genericSchemaResponse,
 } from '@virtual-office-api/core/utils';
 import { JSONSchema7 } from 'json-schema';
-import { addUser } from '@virtual-office-api/core/dynamodb';
+import { getSpacesByUser } from '@virtual-office-api/core/dynamodb';
 import { APIGatewayProxyEventWithAuthorizer } from '@virtual-office-api/core/types';
 
 export const baseHandler = ApiHandler(
     async (_evt: APIGatewayProxyEventWithAuthorizer) => {
         try {
-            const { name, email } = _evt.body as any;
-            console.log('body', _evt.body);
-
-            const user_id = _evt.requestContext?.authorizer?.jwt.claims.sub;
+            const user_id = _evt.requestContext?.authorizer?.jwt.claims
+                .sub as string;
             console.log('user_id', user_id);
 
-            if (!user_id) throw new Error('User not found');
+            const spaces = await getSpacesByUser(user_id);
 
-            await addUser({ id: user_id, name, email });
-
-            return response(200, { message: 'success' });
+            return response(200, { spaces });
         } catch (e) {
             console.error('Error:', e);
             throw e;
@@ -32,6 +28,6 @@ export const baseHandler = ApiHandler(
 
 export const handler = middyWrapper(
     baseHandler,
-    createEventSchema as JSONSchema7,
+    getEventSchema as JSONSchema7,
     genericSchemaResponse as JSONSchema7,
 );
