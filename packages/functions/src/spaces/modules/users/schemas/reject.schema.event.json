@@ -1,0 +1,18 @@
+{
+    "type": "object",
+    "required": ["pathParameters"],
+    "properties": {
+        "pathParameters": {
+            "type": "object",
+            "required": ["space_id", "user_id"],
+            "properties": {
+                "space_id": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "type": "string"
+                }
+            }
+        }
+    }
+}

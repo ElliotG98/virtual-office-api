@@ -1,1 +1,1 @@
-export type Statuses = 'active' | 'requested' | 'removed';
+export type Status = 'approved' | 'requested' | 'rejected';

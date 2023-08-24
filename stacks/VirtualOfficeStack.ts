@@ -86,19 +86,17 @@ export function VirtualOfficeStack({ stack }: StackContext) {
         routes: {
             'POST /spaces': baseLambdaPath + 'spaces/create.handler',
             'GET /spaces/{space_id}': baseLambdaPath + 'spaces/get.handler',
-            'POST /spaces/{space_id}/users':
-                baseLambdaPath + 'spaces/modules/users/create.handler', //Remove this endpoint for more explicit endpoints
             'GET /spaces/{space_id}/users':
                 baseLambdaPath + 'spaces/modules/users/get.handler',
             'POST /users': baseLambdaPath + 'users/create.handler',
             'GET /users/spaces':
                 baseLambdaPath + 'users/modules/spaces/get.handler',
             'POST /spaces/{space_id}/users/request':
-                baseLambdaPath + 'spaces/modules/users/request.handler', //todo
+                baseLambdaPath + 'spaces/modules/users/request.handler',
             'POST /spaces/{space_id}/users/{user_id}/approve':
-                baseLambdaPath + 'spaces/modules/users/approve.handler', //todo
+                baseLambdaPath + 'spaces/modules/users/approve.handler',
             'POST /spaces/{space_id}/users/{user_id}/reject':
-                baseLambdaPath + 'spaces/modules/users/reject.handler', //todo
+                baseLambdaPath + 'spaces/modules/users/reject.handler',
         },
     });
 

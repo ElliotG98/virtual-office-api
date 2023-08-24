@@ -6,15 +6,16 @@ import {
     BatchGetCommand,
 } from '@aws-sdk/lib-dynamodb';
 import { Table } from 'sst/node/table';
+import { Status } from '../../../types';
+import { HttpError } from '../../../utils/response';
 
 const docClient = DynamoDBDocumentClient.from(dynamoDbClient);
 
 export const addUserToSpace = async (
     userId: string,
     spaceId: string,
-    status: string,
+    status: Status,
 ) => {
-    // Query the userSpaceTable to check if an entry already exists for that user
     const queryCommand = new QueryCommand({
         TableName: Table.UserSpaceTable.tableName,
         KeyConditionExpression: 'user_id = :userId AND space_id = :spaceId',
@@ -30,9 +31,12 @@ export const addUserToSpace = async (
         const userSpaceTableEntry = result.Items[0];
 
         if (userSpaceTableEntry.status === 'requested') {
-            return { message: 'Already requested' };
-        } else if (userSpaceTableEntry.status === 'active') {
-            return { message: 'Already active in that space' };
+            throw new HttpError(
+                400,
+                'A request has already been sent to this space',
+            );
+        } else if (userSpaceTableEntry.status === 'approved') {
+            throw new HttpError(400, 'Already active in that space');
         }
     }
 
