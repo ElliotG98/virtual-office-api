@@ -14,6 +14,28 @@ export const addUserToSpace = async (
     spaceId: string,
     status: string,
 ) => {
+    // Query the userSpaceTable to check if an entry already exists for that user
+    const queryCommand = new QueryCommand({
+        TableName: Table.UserSpaceTable.tableName,
+        KeyConditionExpression: 'user_id = :userId AND space_id = :spaceId',
+        ExpressionAttributeValues: {
+            ':userId': userId,
+            ':spaceId': spaceId,
+        },
+    });
+
+    const result = await docClient.send(queryCommand);
+
+    if (result.Items && result.Items.length > 0) {
+        const userSpaceTableEntry = result.Items[0];
+
+        if (userSpaceTableEntry.status === 'requested') {
+            return { message: 'Already requested' };
+        } else if (userSpaceTableEntry.status === 'active') {
+            return { message: 'Already active in that space' };
+        }
+    }
+
     const command = new PutCommand({
         TableName: Table.UserSpaceTable.tableName,
         Item: {

@@ -9,6 +9,7 @@ import httpErrorHandler from '@middy/http-error-handler';
 import { transpileSchema } from '@middy/validator/transpile';
 import { JSONSchema7 } from 'json-schema';
 import { conditionalJsonBodyParser } from './conditionalJSONBodyParser.js';
+import { authorizeUserSpaceMembership } from './authorizeUserSpace.js';
 
 type LambdaHandler = (
     event: APIGatewayProxyEventV2,
@@ -19,11 +20,12 @@ export const middyWrapper = (
     baseHandler: LambdaHandler,
     eventSchemaJson: JSONSchema7,
     responseSchemaJson: JSONSchema7,
+    authorizeUserSpace?: boolean,
 ) => {
     const eventSchema = transpileSchema(eventSchemaJson);
     const responseSchema = transpileSchema(responseSchemaJson);
 
-    return middy(baseHandler)
+    let handler = middy(baseHandler)
         .use(conditionalJsonBodyParser())
         .use(validator({ eventSchema, responseSchema }))
         .use({
@@ -40,4 +42,10 @@ export const middyWrapper = (
             },
         })
         .use(httpErrorHandler());
+
+    if (authorizeUserSpace) {
+        handler = handler.use(authorizeUserSpaceMembership());
+    }
+
+    return handler;
 };

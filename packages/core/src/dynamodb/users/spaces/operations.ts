@@ -33,3 +33,33 @@ export const getSpacesByUser = async (user_id: string) => {
 
     return spacesDetails;
 };
+
+export const checkUserSpaceMembership = async (
+    userId: string,
+    spaceId: string,
+) => {
+    const command = new QueryCommand({
+        TableName: Table.UserSpaceTable.tableName,
+        IndexName: 'byUserAndSpace',
+        KeyConditionExpression:
+            '#userId = :userIdVal AND #spaceId = :spaceIdVal',
+        ExpressionAttributeNames: {
+            '#userId': 'user_id',
+            '#spaceId': 'space_id',
+        },
+        ExpressionAttributeValues: {
+            ':userIdVal': userId,
+            ':spaceIdVal': spaceId,
+        },
+    });
+
+    const response = await docClient.send(command);
+
+    if (!response.Items) return false;
+
+    const approvedUsers = response.Items?.filter(
+        (item) => item.status === 'approved',
+    );
+
+    return approvedUsers?.length > 0 || false;
+};
