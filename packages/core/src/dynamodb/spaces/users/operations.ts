@@ -31,10 +31,7 @@ export const addUserToSpace = async (
         const userSpaceTableEntry = result.Items[0];
 
         if (userSpaceTableEntry.status === 'requested') {
-            throw new HttpError(
-                400,
-                'A request has already been sent to this space',
-            );
+            throw new HttpError(400, 'A request has already been made');
         } else if (userSpaceTableEntry.status === 'approved') {
             throw new HttpError(400, 'Already active in that space');
         }

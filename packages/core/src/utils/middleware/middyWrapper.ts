@@ -10,7 +10,7 @@ import { transpileSchema } from '@middy/validator/transpile';
 import { JSONSchema7 } from 'json-schema';
 import { conditionalJsonBodyParser } from './conditionalJSONBodyParser.js';
 import { authorizeUserSpaceMembership } from './authorizeUserSpace.js';
-import { HttpError } from '../response';
+import { customErrorHandler } from './customErrorHandler.js';
 
 type LambdaHandler = (
     event: APIGatewayProxyEventV2,
@@ -29,26 +29,7 @@ export const middyWrapper = (
     let handler = middy(baseHandler)
         .use(conditionalJsonBodyParser())
         .use(validator({ eventSchema, responseSchema }))
-        .use({
-            onError: (request) => {
-                const response = request.response;
-                const error = <any>request.error;
-
-                if (error instanceof HttpError) {
-                    response.statusCode = error.statusCode;
-                    response.body = JSON.stringify({ message: error.message });
-                    return;
-                }
-
-                if (response.statusCode != 400) return;
-                if (!error.expose || !error.cause) return;
-                response.headers['Content-Type'] = 'application/json';
-                response.body = JSON.stringify({
-                    message: response.body,
-                    validationErrors: error.cause,
-                });
-            },
-        })
+        .use(customErrorHandler())
         .use(httpErrorHandler());
 
     if (authorizeUserSpace) {
