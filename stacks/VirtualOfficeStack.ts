@@ -8,6 +8,7 @@ export function VirtualOfficeStack({ stack }: StackContext) {
             user_id: 'string',
             name: 'string',
             email: 'string',
+            title: 'string',
         },
         primaryIndex: { partitionKey: 'user_id' },
     });
@@ -89,6 +90,7 @@ export function VirtualOfficeStack({ stack }: StackContext) {
             'GET /spaces/{space_id}/users':
                 baseLambdaPath + 'spaces/modules/users/get.handler',
             'POST /users': baseLambdaPath + 'users/create.handler',
+            'GET /users': baseLambdaPath + 'users/get.handler',
             'GET /users/spaces':
                 baseLambdaPath + 'users/modules/spaces/get.handler',
             'POST /spaces/{space_id}/users/request':

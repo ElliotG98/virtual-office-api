@@ -10,15 +10,23 @@ export const getSpacesByUser = async (user_id: string) => {
         KeyConditionExpression: 'user_id = :user_id',
         ExpressionAttributeValues: {
             ':user_id': user_id,
+            ':statusVal': 'rejected',
         },
+        ExpressionAttributeNames: {
+            '#statusAttr': 'status',
+        },
+        FilterExpression:
+            'attribute_not_exists(#statusAttr) OR #statusAttr <> :statusVal',
     });
     const userSpaceResponse = await docClient.send(userSpaceCommand);
 
-    const spaceIds =
-        userSpaceResponse.Items?.map((item) => item.space_id) || [];
+    const userSpaces = userSpaceResponse.Items || [];
 
     const spacesDetails = await Promise.all(
-        spaceIds.map(async (space_id) => {
+        userSpaces.map(async (userSpace) => {
+            const space_id = userSpace.space_id;
+            const status = userSpace.status;
+
             const spaceCommand = new QueryCommand({
                 TableName: Table.SpaceTable.tableName,
                 KeyConditionExpression: 'space_id = :space_id',
@@ -26,8 +34,13 @@ export const getSpacesByUser = async (user_id: string) => {
                     ':space_id': space_id,
                 },
             });
+
             const spaceResponse = await docClient.send(spaceCommand);
-            return spaceResponse.Items?.[0];
+
+            return {
+                ...spaceResponse.Items?.[0],
+                status,
+            };
         }),
     );
 
