@@ -1,12 +1,12 @@
 import { ApiHandler } from 'sst/node/api';
-import createEventSchema from './schemas/create.schema.event.json';
+import updateEventSchema from './schemas/update.schema.event.json';
 import { middyWrapper } from '@virtual-office-api/core/utils/middleware';
 import {
     response,
     genericSchemaResponse,
 } from '@virtual-office-api/core/utils';
 import { JSONSchema7 } from 'json-schema';
-import { addUser } from '@virtual-office-api/core/dynamodb';
+import { updateUser } from '@virtual-office-api/core/dynamodb';
 import { APIGatewayProxyEventWithAuthorizer } from '@virtual-office-api/core/types';
 import { HttpError } from '@virtual-office-api/core/utils/response';
 
@@ -21,7 +21,13 @@ export const baseHandler = ApiHandler(
 
             if (!user_id) throw new HttpError(400, 'User not found');
 
-            await addUser({ id: user_id, firstName, lastName, email, title });
+            await updateUser({
+                id: user_id,
+                firstName,
+                lastName,
+                email,
+                title,
+            });
 
             return response(200, { message: 'success' });
         } catch (e) {
@@ -33,6 +39,6 @@ export const baseHandler = ApiHandler(
 
 export const handler = middyWrapper(
     baseHandler,
-    createEventSchema as JSONSchema7,
+    updateEventSchema as JSONSchema7,
     genericSchemaResponse as JSONSchema7,
 );

@@ -6,7 +6,8 @@ export function VirtualOfficeStack({ stack }: StackContext) {
     const userTable = new Table(stack, 'UserTable', {
         fields: {
             user_id: 'string',
-            name: 'string',
+            first_name: 'string',
+            last_name: 'string',
             email: 'string',
             title: 'string',
         },
@@ -91,6 +92,7 @@ export function VirtualOfficeStack({ stack }: StackContext) {
                 baseLambdaPath + 'spaces/modules/users/get.handler',
             'POST /users': baseLambdaPath + 'users/create.handler',
             'GET /users': baseLambdaPath + 'users/get.handler',
+            'PATCH /users': baseLambdaPath + 'users/update.handler',
             'GET /users/spaces':
                 baseLambdaPath + 'users/modules/spaces/get.handler',
             'POST /spaces/{space_id}/users/request':

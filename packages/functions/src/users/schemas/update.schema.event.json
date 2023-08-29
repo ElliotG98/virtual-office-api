@@ -11,9 +11,6 @@
                 "lastName": {
                     "type": "string"
                 },
-                "email": {
-                    "type": "string"
-                },
                 "title": {
                     "type": "string"
                 }
