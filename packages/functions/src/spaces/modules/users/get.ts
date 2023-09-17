@@ -7,20 +7,28 @@ import {
 } from '@virtual-office-api/core/utils';
 import { JSONSchema7 } from 'json-schema';
 import { getUsersBySpace } from '@virtual-office-api/core/dynamodb';
+import { APIGatewayProxyEventWithAuthorizer } from '@virtual-office-api/core/types';
+import { HttpError } from '@virtual-office-api/core/utils/response';
 
-export const baseHandler = ApiHandler(async (_evt) => {
-    try {
-        const { space_id } = _evt.pathParameters as any;
-        console.log('space_id', space_id);
+export const baseHandler = ApiHandler(
+    async (_evt: APIGatewayProxyEventWithAuthorizer) => {
+        try {
+            const { space_id } = _evt.pathParameters as any;
+            console.log('space_id', space_id);
+            const user_id = _evt.requestContext?.authorizer?.jwt.claims.sub;
+            console.log('user_id', user_id);
 
-        const users = await getUsersBySpace(space_id);
+            if (!user_id) throw new HttpError(404, 'User not found');
 
-        return response(200, { users });
-    } catch (e) {
-        console.error('Error:', e);
-        throw e;
-    }
-});
+            const users = await getUsersBySpace(space_id, user_id);
+
+            return response(200, { users });
+        } catch (e) {
+            console.error('Error:', e);
+            throw e;
+        }
+    },
+);
 
 export const handler = middyWrapper(
     baseHandler,

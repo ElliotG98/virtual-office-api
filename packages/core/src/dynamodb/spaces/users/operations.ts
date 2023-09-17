@@ -51,7 +51,10 @@ export const addUserToSpace = async (
     return response;
 };
 
-export const getUsersBySpace = async (spaceId: string) => {
+export const getUsersBySpace = async (
+    spaceId: string,
+    currentUserId: string,
+) => {
     const command = new QueryCommand({
         TableName: Table.UserSpaceTable.tableName,
         IndexName: 'bySpace',
@@ -79,5 +82,10 @@ export const getUsersBySpace = async (spaceId: string) => {
     });
 
     const userResponse = await docClient.send(userCommand);
-    return userResponse.Responses?.[Table.UserTable.tableName] || [];
+    const users = userResponse.Responses?.[Table.UserTable.tableName] || [];
+
+    return users.map((user) => ({
+        ...user,
+        currentUser: user.user_id === currentUserId,
+    }));
 };

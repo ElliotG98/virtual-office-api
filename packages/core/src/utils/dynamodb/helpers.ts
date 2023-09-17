@@ -1,4 +1,6 @@
-export const generateUpdateExpression = <T extends {}>(object: T) => {
+export const generateUpdateExpression = <T extends Record<string, any>>(
+    object: T,
+) => {
     const exp: any = {
         UpdateExpression: 'set',
         ExpressionAttributeNames: {},
