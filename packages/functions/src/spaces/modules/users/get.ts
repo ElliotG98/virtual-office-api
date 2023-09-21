@@ -30,8 +30,11 @@ export const baseHandler = ApiHandler(
     },
 );
 
+const authorizeUserSpace = true;
+
 export const handler = middyWrapper(
     baseHandler,
     getEventSchema as JSONSchema7,
     genericSchemaResponse as JSONSchema7,
+    authorizeUserSpace,
 );
