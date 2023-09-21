@@ -12,6 +12,9 @@ export function VirtualOfficeStack({ stack }: StackContext) {
             title: 'string',
         },
         primaryIndex: { partitionKey: 'user_id' },
+        globalIndexes: {
+            emailIndex: { partitionKey: 'email' },
+        },
     });
 
     const spaceTable = new Table(stack, 'SpaceTable', {
@@ -101,6 +104,8 @@ export function VirtualOfficeStack({ stack }: StackContext) {
                 baseLambdaPath + 'spaces/modules/users/approve.handler',
             'POST /spaces/{space_id}/users/{user_id}/reject':
                 baseLambdaPath + 'spaces/modules/users/reject.handler',
+            'POST /spaces/{space_id}/users/invite':
+                baseLambdaPath + 'spaces/modules/users/invite.handler',
         },
     });
 

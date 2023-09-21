@@ -7,13 +7,28 @@ import { Table } from 'sst/node/table';
 import { dynamoDbClient } from '../client';
 import { User } from '../../types/user';
 import { HttpError } from '../../utils/response';
-import { UpdateItemCommand } from '@aws-sdk/client-dynamodb';
+import { QueryCommand, UpdateItemCommand } from '@aws-sdk/client-dynamodb';
 import { generateUpdateExpression } from '../../utils/dynamodb/helpers';
 
 const docClient = DynamoDBDocumentClient.from(dynamoDbClient);
 
 export const addUser = async (user: User) => {
-    const command = new PutCommand({
+    const queryCommand = new QueryCommand({
+        TableName: Table.UserTable.tableName,
+        IndexName: 'emailIndex',
+        KeyConditionExpression: 'email = :emailValue',
+        ExpressionAttributeValues: {
+            ':emailValue': { S: user.email },
+        },
+    });
+
+    const queryResult = await docClient.send(queryCommand);
+
+    if (queryResult.Items && queryResult.Items.length > 0) {
+        throw new HttpError(400, 'Email already exists');
+    }
+
+    const putCommand = new PutCommand({
         TableName: Table.UserTable.tableName,
         Item: {
             user_id: user.id,
@@ -24,9 +39,9 @@ export const addUser = async (user: User) => {
         },
     });
 
-    const response = await docClient.send(command);
-    console.log(response);
-    return response;
+    const putResponse = await docClient.send(putCommand);
+    console.log(putResponse);
+    return putResponse;
 };
 
 export const getUser = async (userId: string): Promise<User | null> => {
@@ -55,8 +70,49 @@ export const getUser = async (userId: string): Promise<User | null> => {
             lastName: response.Item.last_name,
         } as User;
     } catch (error) {
-        console.error('An error occurred while fetching the user:', error);
-        return null;
+        console.error(
+            'An error occurred while fetching the user:',
+            JSON.stringify(error),
+        );
+        throw error;
+    }
+};
+
+export const getUserByEmail = async (email: string) => {
+    try {
+        const queryCommand = new QueryCommand({
+            TableName: Table.UserTable.tableName,
+            IndexName: 'emailIndex',
+            KeyConditionExpression: 'email = :value',
+            ExpressionAttributeValues: {
+                ':value': { S: email },
+            },
+        });
+        const response = await docClient.send(queryCommand);
+
+        const users = response.Items || [];
+
+        if (!users.length) {
+            throw new HttpError(
+                404,
+                'User not found',
+                `User with email:${email} was not found in the UserTable`,
+            );
+        }
+
+        const user = users[0];
+
+        return {
+            ...user,
+            firstName: user?.first_name.S,
+            lastName: user?.last_name.S,
+        } as User;
+    } catch (error) {
+        console.error(
+            'An error occurred while fetching the user:',
+            JSON.stringify(error),
+        );
+        throw error;
     }
 };
 

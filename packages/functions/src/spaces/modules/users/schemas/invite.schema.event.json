@@ -1,0 +1,24 @@
+{
+    "type": "object",
+    "required": ["pathParameters", "body"],
+    "properties": {
+        "pathParameters": {
+            "type": "object",
+            "required": ["space_id", "user_id"],
+            "properties": {
+                "space_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "body": {
+            "type": "object",
+            "properties": {
+                "email": {
+                    "type": "string",
+                    "format": "email"
+                }
+            }
+        }
+    }
+}
