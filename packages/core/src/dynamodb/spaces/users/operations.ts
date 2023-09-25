@@ -68,10 +68,15 @@ export const getUsersBySpace = async (
     });
 
     const response = await docClient.send(command);
-    const userIds = response.Items?.map((item) => item.user_id);
-    if (!userIds || userIds.length === 0) return [];
+    const userSpaceItems = response.Items?.map((item) => ({
+        user_id: item.user_id,
+        status: item.status,
+    }));
+    if (!userSpaceItems || userSpaceItems.length === 0) return [];
 
-    const keys = userIds.map((userId) => ({ user_id: userId }));
+    const keys = userSpaceItems.map((userSpaceItem) => ({
+        user_id: userSpaceItem.user_id,
+    }));
 
     const userCommand = new BatchGetCommand({
         RequestItems: {
@@ -87,5 +92,8 @@ export const getUsersBySpace = async (
     return users.map((user) => ({
         ...user,
         currentUser: user.user_id === currentUserId,
+        status: userSpaceItems.find(
+            (userSpaceItem) => userSpaceItem.user_id === user.user_id,
+        )?.status,
     }));
 };
