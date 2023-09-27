@@ -87,7 +87,7 @@ export const getUserByEmail = async (email: string) => {
         if (!users.length) {
             throw new HttpError(
                 404,
-                'User not found',
+                'A user with that email was not found',
                 `User with email:${email} was not found in the UserTable`,
             );
         }
@@ -95,9 +95,11 @@ export const getUserByEmail = async (email: string) => {
         const user = users[0];
 
         return {
-            ...user,
+            id: user.user_id.S,
             firstName: user?.first_name.S,
             lastName: user?.last_name.S,
+            email: user?.email.S,
+            title: user?.title.S,
         } as User;
     } catch (error) {
         console.error(
