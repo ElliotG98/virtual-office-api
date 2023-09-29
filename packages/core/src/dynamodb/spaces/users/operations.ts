@@ -6,7 +6,7 @@ import {
     BatchGetCommand,
 } from '@aws-sdk/lib-dynamodb';
 import { Table } from 'sst/node/table';
-import { Status } from '../../../types';
+import { Status, User } from '../../../types';
 import { HttpError } from '../../../utils/response';
 
 const docClient = DynamoDBDocumentClient.from(dynamoDbClient);
@@ -90,10 +90,14 @@ export const getUsersBySpace = async (
     const users = userResponse.Responses?.[Table.UserTable.tableName] || [];
 
     return users.map((user) => ({
-        ...user,
+        id: user.user_id,
+        firstName: user.first_name,
+        lastName: user.last_name,
+        email: user.email,
+        title: user.title,
         currentUser: user.user_id === currentUserId,
         status: userSpaceItems.find(
             (userSpaceItem) => userSpaceItem.user_id === user.user_id,
         )?.status,
-    }));
+    })) as User[];
 };
