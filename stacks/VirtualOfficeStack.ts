@@ -38,6 +38,24 @@ export function VirtualOfficeStack({ stack }: StackContext) {
         },
     });
 
+    const userSpaceLogTable = new Table(stack, 'UserSpaceLogTable', {
+        fields: {
+            log_id: 'string',
+            user_id: 'string',
+            space_id: 'string',
+            action: 'string',
+            status: 'string',
+            initiated_by: 'string',
+            error_message: 'string',
+            timestamp: 'string',
+        },
+        primaryIndex: { partitionKey: 'log_id' },
+        globalIndexes: {
+            byUser: { partitionKey: 'user_id', sortKey: 'timestamp' },
+            bySpace: { partitionKey: 'space_id', sortKey: 'timestamp' },
+        },
+    });
+
     const messagesTable = new Table(stack, 'MessagesTable', {
         fields: {
             space_id: 'string',
@@ -71,6 +89,7 @@ export function VirtualOfficeStack({ stack }: StackContext) {
                 bind: [
                     spaceTable,
                     userSpaceTable,
+                    userSpaceLogTable,
                     messagesTable,
                     userTable,
                     USER_POOL_ID,
@@ -106,6 +125,8 @@ export function VirtualOfficeStack({ stack }: StackContext) {
                 baseLambdaPath + 'spaces/modules/users/reject.handler',
             'POST /spaces/{space_id}/users/invite':
                 baseLambdaPath + 'spaces/modules/users/invite.handler',
+            'DELETE /spaces/{space_id}/users/{user_id}':
+                baseLambdaPath + 'spaces/modules/users/remove.handler',
         },
     });
 
@@ -118,6 +139,7 @@ export function VirtualOfficeStack({ stack }: StackContext) {
         IdentityPoolId: auth.cognitoIdentityPoolId,
         spaceTableArn: spaceTable.tableArn,
         userSpaceTableArn: userSpaceTable.tableArn,
+        userSpaceLogTableArn: userSpaceLogTable.tableArn,
         messagesTableArn: messagesTable.tableArn,
         userTableArn: userTable.tableArn,
     });
