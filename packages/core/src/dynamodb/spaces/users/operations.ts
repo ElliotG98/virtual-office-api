@@ -80,7 +80,7 @@ export const addUserToSpace = async (
 
         if (
             userSpaceTableEntry.status === 'requested' &&
-            status !== 'approved'
+            status === 'requested'
         ) {
             throw new HttpError(400, 'A request has already been made');
         } else if (userSpaceTableEntry.status === 'approved') {
